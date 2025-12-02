@@ -1,13 +1,11 @@
-# --- modules/security/main.tf ---
+# --- modules/security-group/main.tf ---
 
 # 1. Security Group cho Application Load Balancer (ALB)
-# Cho phép truy cập từ Internet vào ALB.
 resource "aws_security_group" "alb_sg" {
   name        = "${var.environment}-alb-sg"
   description = "Security Group for Application Load Balancer"
   vpc_id      = var.vpc_id
 
-  # Inbound Rule: Cho phép HTTP (Port 80) từ mọi nơi
   ingress {
     description = "Allow HTTP from anywhere"
     from_port   = 80
@@ -16,7 +14,6 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Inbound Rule: Cho phép HTTPS (Port 443) từ mọi nơi (nếu có SSL)
   ingress {
     description = "Allow HTTPS from anywhere"
     from_port   = 443
@@ -25,7 +22,6 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Outbound Rule: Cho phép ra ngoài thoải mái
   egress {
     from_port   = 0
     to_port     = 0
@@ -39,29 +35,55 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-# 2. Security Group cho Application Servers (EC2)
-# Chỉ cho phép traffic từ ALB, không cho phép truy cập trực tiếp từ Internet.
+# 2. Security Group cho Bastion Host
+resource "aws_security_group" "bastion_sg" {
+  name        = "${var.environment}-bastion-sg"
+  description = "Security Group for Bastion Host"
+  vpc_id      = var.vpc_id
+
+  # Cho phép SSH từ mọi nơi (Thực tế nên giới hạn IP cụ thể)
+  ingress {
+    description = "Allow SSH from anywhere"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.environment}-bastion-sg"
+    Environment = var.environment
+  }
+}
+
+# 3. Security Group cho Application Servers (EC2)
 resource "aws_security_group" "app_sg" {
   name        = "${var.environment}-app-sg"
   description = "Security Group for Application Servers"
   vpc_id      = var.vpc_id
 
-  # Inbound Rule: Chỉ nhận traffic từ ALB Security Group
   ingress {
     description     = "Allow HTTP from ALB only"
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id] # Chaining Security Groups
+    security_groups = [aws_security_group.alb_sg.id]
   }
   
-  # Inbound Rule: Cho phép SSH từ Bastion Host (nếu có - ở đây giả lập mở port 22 trong VPC)
+  # Cho phép SSH từ Bastion Host
   ingress {
-    description = "Allow SSH from VPC"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
+    description     = "Allow SSH from Bastion Host"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
   }
 
   egress {
@@ -77,20 +99,27 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
-# 3. Security Group cho Database (RDS)
-# Chỉ cho phép traffic từ Application Servers.
+# 4. Security Group cho Database (RDS)
 resource "aws_security_group" "db_sg" {
   name        = "${var.environment}-db-sg"
   description = "Security Group for Database"
   vpc_id      = var.vpc_id
 
-  # Inbound Rule: Chỉ nhận traffic PostgreSQL (Port 5432) từ App Security Group
   ingress {
     description     = "Allow PostgreSQL from App Server"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
     security_groups = [aws_security_group.app_sg.id]
+  }
+
+  # Cho phép truy cập từ Bastion Host để debug DB (Optional)
+  ingress {
+    description     = "Allow PostgreSQL from Bastion Host"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
   }
 
   tags = {

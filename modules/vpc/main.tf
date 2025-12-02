@@ -1,4 +1,4 @@
-# --- modules/networking/main.tf ---
+# --- modules/vpc/main.tf ---
 
 # 1. Tạo VPC (Virtual Private Cloud)
 # Đây là mạng riêng ảo chứa toàn bộ tài nguyên của phòng khám.

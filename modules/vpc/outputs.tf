@@ -1,4 +1,4 @@
-# --- modules/networking/outputs.tf ---
+# --- modules/vpc/outputs.tf ---
 
 output "vpc_id" {
   description = "ID của VPC được tạo"

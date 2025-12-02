@@ -1,4 +1,4 @@
-# --- modules/database/main.tf ---
+# --- modules/rds/main.tf ---
 
 # 1. DB Subnet Group
 # Định nghĩa nhóm các subnet mà RDS có thể nằm trong đó (Private Subnets).

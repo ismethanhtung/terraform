@@ -1,4 +1,4 @@
-# --- modules/storage/variables.tf ---
+# --- modules/s3/variables.tf ---
 
 variable "environment" {
   type = string

@@ -1,4 +1,4 @@
-# --- modules/storage/main.tf ---
+# --- modules/s3/main.tf ---
 
 resource "random_id" "bucket_suffix" {
   byte_length = 4

@@ -1,4 +1,4 @@
-# --- modules/networking/variables.tf ---
+# --- modules/vpc/variables.tf ---
 
 variable "environment" {
   description = "Môi trường triển khai (dev, prod, staging)"

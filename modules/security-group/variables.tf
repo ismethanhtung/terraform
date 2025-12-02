@@ -1,4 +1,4 @@
-# --- modules/security/variables.tf ---
+# --- modules/security-group/variables.tf ---
 
 variable "environment" {
   description = "Môi trường triển khai"

@@ -1,4 +1,4 @@
-# --- modules/storage/outputs.tf ---
+# --- modules/s3/outputs.tf ---
 
 output "bucket_name" {
   description = "Tên của S3 Bucket"

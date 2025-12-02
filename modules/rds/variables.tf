@@ -1,4 +1,4 @@
-# --- modules/database/variables.tf ---
+# --- modules/rds/variables.tf ---
 
 variable "environment" {
   type = string

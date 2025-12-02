@@ -1,4 +1,4 @@
-# --- modules/database/outputs.tf ---
+# --- modules/rds/outputs.tf ---
 
 output "db_endpoint" {
   description = "Endpoint kết nối tới Database"
