@@ -1,5 +1,3 @@
-# --- modules/ec2/variables.tf ---
-
 variable "name" {
   description = "Tên của EC2 instance"
   type        = string
@@ -36,6 +34,12 @@ variable "associate_public_ip_address" {
   description = "Gán Public IP hay không"
   type        = bool
   default     = false
+}
+
+variable "user_data" {
+  description = "Script user data để chạy khi khởi tạo instance"
+  type        = string
+  default     = null
 }
 
 variable "tags" {

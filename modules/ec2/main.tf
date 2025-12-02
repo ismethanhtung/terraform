@@ -1,5 +1,3 @@
-# --- modules/ec2/main.tf ---
-
 resource "aws_instance" "this" {
   ami           = var.ami_id
   instance_type = var.instance_type
@@ -10,6 +8,8 @@ resource "aws_instance" "this" {
 
   # Nếu là Bastion Host thì cần Public IP
   associate_public_ip_address = var.associate_public_ip_address
+  
+  user_data = var.user_data
 
   tags = merge(
     {
