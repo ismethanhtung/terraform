@@ -66,7 +66,6 @@ resource "aws_subnet" "private" {
 # Cần một Elastic IP (EIP) cho NAT Gateway.
 
 resource "aws_eip" "nat" {
-  domain = "vpc"
   tags = {
     Name = "${var.environment}-nat-eip"
   }
