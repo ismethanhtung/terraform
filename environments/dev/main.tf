@@ -79,7 +79,7 @@ module "backend" {
     Environment = var.environment
     Role        = "Backend"
   }
-}
+} 
 
 # Attach Backend EC2 to ALB Target Group
 resource "aws_lb_target_group_attachment" "backend" {
