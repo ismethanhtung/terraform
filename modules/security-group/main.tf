@@ -1,5 +1,3 @@
-# --- modules/security-group/main.tf ---
-
 # 1. Security Group cho Application Load Balancer (ALB)
 resource "aws_security_group" "alb_sg" {
   name        = "${var.environment}-alb-sg"
@@ -99,27 +97,34 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
-# 4. Security Group cho Database (RDS)
+# 4. Security Group cho Database (MSSQL)
 resource "aws_security_group" "db_sg" {
   name        = "${var.environment}-db-sg"
   description = "Security Group for Database"
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "Allow PostgreSQL from App Server"
-    from_port       = 5432
-    to_port         = 5432
+    description     = "Allow MSSQL from App Server"
+    from_port       = 1433
+    to_port         = 1433
     protocol        = "tcp"
     security_groups = [aws_security_group.app_sg.id]
   }
 
   # Cho phép truy cập từ Bastion Host để debug DB (Optional)
   ingress {
-    description     = "Allow PostgreSQL from Bastion Host"
-    from_port       = 5432
-    to_port         = 5432
+    description     = "Allow MSSQL from Bastion Host"
+    from_port       = 1433
+    to_port         = 1433
     protocol        = "tcp"
     security_groups = [aws_security_group.bastion_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
