@@ -19,3 +19,8 @@ output "db_sg_id" {
   description = "ID của Security Group cho Database"
   value       = aws_security_group.db_sg.id
 }
+
+output "ecs_tasks_sg_id" {
+  description = "ID của Security Group cho ECS Tasks"
+  value       = aws_security_group.ecs_tasks_sg.id
+}
