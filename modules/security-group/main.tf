@@ -132,3 +132,32 @@ resource "aws_security_group" "db_sg" {
     Environment = var.environment
   }
 }
+
+# 5. Security Group cho ECS Tasks
+resource "aws_security_group" "ecs_tasks_sg" {
+  name        = "${var.environment}-ecs-tasks-sg"
+  description = "Security Group for ECS Tasks running on Fargate"
+  vpc_id      = var.vpc_id
+
+  # Cho phép traffic từ ALB vào bất kỳ port nào của container (dynamic port mapping hoặc fixed port)
+  # Lưu ý: Cần mở rộng range port nếu dùng dynamic port, nhưng Fargate thường dùng fixed port 80/443 hoặc custom
+  ingress {
+    description     = "Allow traffic from ALB"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.environment}-ecs-tasks-sg"
+    Environment = var.environment
+  }
+}

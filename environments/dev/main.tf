@@ -55,37 +55,78 @@ module "alb" {
   alb_sg_id         = module.security_group.alb_sg_id
 }
 
-# 5. Backend EC2 (Docker)
-module "backend" {
-  source = "../../modules/ec2"
+# 5. ECS Common Resources (IAM & Logs)
+module "ecs_iam" {
+  source = "../../modules/iam"
 
-  name               = "${var.environment}-backend"
-  ami_id             = data.aws_ami.amazon_linux_2.id # Dùng Amazon Linux 2 để cài Docker
-  instance_type      = var.instance_type
-  subnet_id          = module.vpc.private_subnet_ids[0]
-  security_group_ids = [module.security_group.app_sg_id]
+  environment = var.environment
+  tags = {
+    Environment = var.environment
+  }
+}
+
+module "backend_logs" {
+  source = "../../modules/cloudwatch"
+
+  log_group_name    = "/ecs/${var.environment}-backend"
+  retention_in_days = 30
+  tags = {
+    Environment = var.environment
+    Role        = "Backend"
+  }
+}
+
+# 6. ECS Cluster
+module "ecs_cluster" {
+  source = "../../modules/ecs-cluster"
+
+  name = "${var.environment}-cluster"
+  tags = {
+    Environment = var.environment
+  }
+}
+
+# 7. Backend Service (ECS Fargate)
+module "backend_service" {
+  source = "../../modules/ecs-service"
+
+  environment  = var.environment
+  service_name = "backend"
   
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              amazon-linux-extras install docker -y
-              service docker start
-              usermod -a -G docker ec2-user
-              systemctl enable docker
-              docker run -d -p 80:80 ismethanhtung/ngocminh-be:latest
-              EOF
+  cluster_id   = module.ecs_cluster.cluster_id
+  cluster_name = module.ecs_cluster.cluster_name
+  
+  # Inject IAM Roles
+  execution_role_arn = module.ecs_iam.execution_role_arn
+  task_role_arn      = module.ecs_iam.task_role_arn
+  
+  # Inject CloudWatch
+  log_group_name = module.backend_logs.log_group_name
+  region         = "ap-southeast-1" # Hardcode hoặc lấy từ data source
+  
+  # Network & Security Group (Sử dụng SG từ module security_group đã có)
+
+  subnet_ids         = module.vpc.private_subnet_ids
+  security_group_ids = [module.security_group.ecs_tasks_sg_id]
+  
+  # Container Config
+  container_image = "ismethanhtung/ngocminh-be:latest"
+  container_port  = 80
+  cpu             = 256
+  memory          = 512
+  
+  # Load Balancer Integration
+  target_group_arn = module.alb.target_group_arn
+  
+  # Auto Scaling
+  enable_autoscaling = true
+  min_capacity       = 1
+  max_capacity       = 3
 
   tags = {
     Environment = var.environment
     Role        = "Backend"
   }
-} 
-
-# Attach Backend EC2 to ALB Target Group
-resource "aws_lb_target_group_attachment" "backend" {
-  target_group_arn = module.alb.target_group_arn
-  target_id        = module.backend.instance_id
-  port             = 80
 }
 
 # 6. DB EC2 (MSSQL)
