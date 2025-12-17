@@ -105,7 +105,7 @@ module "backend_service" {
   region         = "ap-southeast-1" # Hardcode hoặc lấy từ data source
   
   # Network & Security Group (Sử dụng SG từ module security_group đã có)
-  vpc_id             = module.vpc.vpc_id # Không dùng trong module service nữa nhưng cần cho context
+
   subnet_ids         = module.vpc.private_subnet_ids
   security_group_ids = [module.security_group.ecs_tasks_sg_id]
   
