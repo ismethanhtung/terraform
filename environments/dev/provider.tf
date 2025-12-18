@@ -7,6 +7,15 @@ terraform {
       version = "~> 4.0"
     }
   }
+
+  # Backend S3 + DynamoDB để lưu state Terraform
+  backend "s3" {
+    bucket         = "polymarket-infra-terraform-state"
+    key            = "dev/terraform.tfstate"
+    region         = "ap-southeast-1"
+    dynamodb_table = "polymarket-infra-terraform-lock"
+    encrypt        = true
+  }
 }
 
 provider "aws" {

@@ -9,3 +9,7 @@ db_name              = "clinic_dev_db"
 db_username          = "admin"
 db_password          = "SuperSecretPass123!" # Trong thực tế nên dùng AWS Secrets Manager
 instance_type        = "t3.micro"
+
+# Supabase Configuration
+supabase_url = "https://tenghuxzjlxvqyrycyts.supabase.co"
+supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmdodXh6amx4dnF5cnljeXRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMjgwNDUsImV4cCI6MjA3NzgwNDA0NX0.jook-ubNJK-aVBbFsIUw_xREdH5zwYynfnvkn52jICs"

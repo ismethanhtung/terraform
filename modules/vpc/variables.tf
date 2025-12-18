@@ -5,6 +5,11 @@ variable "environment" {
   type        = string
 }
 
+variable "project_name" {
+  description = "Tên project dùng làm prefix cho tài nguyên VPC"
+  type        = string
+}
+
 variable "vpc_cidr" {
   description = "Dải IP cho VPC (ví dụ: 10.0.0.0/16)"
   type        = string
@@ -18,4 +23,10 @@ variable "public_subnet_cidrs" {
 variable "private_subnet_cidrs" {
   description = "Danh sách các CIDR block cho Private Subnets"
   type        = list(string)
+}
+
+variable "enable_nat" {
+  description = "Bật/tắt NAT Gateway cho private subnets (tốn chi phí nếu bật)"
+  type        = bool
+  default     = false
 }
