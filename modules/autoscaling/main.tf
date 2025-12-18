@@ -11,7 +11,7 @@ data "aws_ami" "amazon_linux_2" {
 }
 
 resource "aws_launch_template" "main" {
-  name_prefix   = "${var.environment}-clinic-lt-"
+  name_prefix   = "${var.environment}-${var.project_name}-lt-"
   image_id      = data.aws_ami.amazon_linux_2.id
   instance_type = var.instance_type
 
@@ -33,14 +33,14 @@ resource "aws_launch_template" "main" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name        = "${var.environment}-clinic-app-server"
+      Name        = "${var.environment}-${var.project_name}-app-server"
       Environment = var.environment
     }
   }
 }
 
 resource "aws_autoscaling_group" "main" {
-  name                = "${var.environment}-clinic-asg"
+  name                = "${var.environment}-${var.project_name}-asg"
   vpc_zone_identifier = var.private_subnet_ids
   target_group_arns   = var.target_group_arns
 
@@ -55,7 +55,7 @@ resource "aws_autoscaling_group" "main" {
 
   tag {
     key                 = "Name"
-    value               = "${var.environment}-clinic-asg-instance"
+    value               = "${var.environment}-${var.project_name}-asg-instance"
     propagate_at_launch = true
   }
 }

@@ -4,6 +4,11 @@ variable "environment" {
   type = string
 }
 
+variable "project_name" {
+  description = "Tên project dùng làm prefix cho tài nguyên autoscaling"
+  type        = string
+}
+
 variable "instance_type" {
   type    = string
   default = "t3.micro"

@@ -2,10 +2,10 @@
 
 output "bucket_name" {
   description = "Tên của S3 Bucket"
-  value       = aws_s3_bucket.clinic_data.bucket
+  value       = aws_s3_bucket.data.bucket
 }
 
 output "bucket_arn" {
   description = "ARN của S3 Bucket"
-  value       = aws_s3_bucket.clinic_data.arn
+  value       = aws_s3_bucket.data.arn
 }

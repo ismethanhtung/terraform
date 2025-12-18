@@ -12,6 +12,12 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "project_name" {
+  description = "Tên dự án (dùng làm prefix cho tài nguyên)"
+  type        = string
+  default     = "polymarket"
+}
+
 variable "vpc_cidr" {
   description = "VPC CIDR"
   type        = string
@@ -40,4 +46,15 @@ variable "db_password" {
 
 variable "instance_type" {
   type = string
+}
+
+variable "supabase_url" {
+  description = "Supabase URL"
+  type        = string
+}
+
+variable "supabase_key" {
+  description = "Supabase API Key"
+  type        = string
+  sensitive   = true
 }

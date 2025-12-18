@@ -4,6 +4,11 @@ variable "environment" {
   type = string
 }
 
+variable "project_name" {
+  description = "Tên project dùng để đặt prefix cho tài nguyên RDS"
+  type        = string
+}
+
 variable "private_subnet_ids" {
   description = "Danh sách ID của Private Subnets"
   type        = list(string)

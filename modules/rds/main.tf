@@ -14,7 +14,7 @@ resource "aws_db_subnet_group" "main" {
 
 # 2. RDS Instance (PostgreSQL)
 resource "aws_db_instance" "main" {
-  identifier        = "${var.environment}-clinic-db"
+  identifier        = "${var.environment}-${var.project_name}-db"
   engine            = "postgres"
   engine_version    = "13.7" # Phiên bản PostgreSQL
   instance_class    = var.db_instance_class
@@ -34,7 +34,7 @@ resource "aws_db_instance" "main" {
   skip_final_snapshot = true       # Bỏ qua snapshot khi xóa (chỉ dùng cho môi trường Dev/Học tập)
 
   tags = {
-    Name        = "${var.environment}-clinic-db"
+    Name        = "${var.environment}-${var.project_name}-db"
     Environment = var.environment
   }
 }
