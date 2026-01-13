@@ -15,7 +15,7 @@ resource "aws_s3_bucket" "data" {
 }
 
 # Bật tính năng Versioning (Lưu lịch sử thay đổi file)
-# Quan trọng cho dữ liệu y tế để tránh xóa nhầm.
+# Quan trọng cho dữ liệu quan trọng tránh xóa nhầm.
 resource "aws_s3_bucket_versioning" "versioning" {
   bucket = aws_s3_bucket.data.id
   versioning_configuration {

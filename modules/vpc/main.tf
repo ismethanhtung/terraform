@@ -1,7 +1,6 @@
 # --- modules/vpc/main.tf ---
 
-# 1. Tạo VPC (Virtual Private Cloud)
-# Đây là mạng riêng ảo chứa toàn bộ tài nguyên.
+# 1. Tạo VPC (Virtual Private Cloud) - Mạng riêng ảo chứa toàn bộ tài nguyên.
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true # Cho phép sử dụng DNS hostname
@@ -31,7 +30,7 @@ data "aws_availability_zones" "available" {
 }
 
 # 4. Tạo Public Subnets
-# Dùng cho Load Balancer và Bastion Host.
+# Dùng cho Load Balancer.
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
@@ -64,6 +63,9 @@ resource "aws_subnet" "private" {
 # 6. NAT Gateway (Network Address Translation)
 # Cho phép Private Subnet truy cập Internet (chiều đi ra) nhưng chặn chiều từ Internet vào.
 # Cần một Elastic IP (EIP) cho NAT Gateway.
+# Có thể tạo NAT ở public subnet, rồi cho private subnets đi outbound Internet qua NAT đó
+# Tuy nhiên cấu hình hiện tại đang chưa Best Practice: Only 1 NAT ở 1 AZ cho toàn VPC: NAT Down thì toàn bộ private subnet ở AZ khác mất outbound
+# Đồng thời traffic từ Private Public ở Zone khác cũng phải đi qua NAT này -> tăng cross-AZ traffic
 
 resource "aws_eip" "nat" {
   count = var.enable_nat ? 1 : 0
