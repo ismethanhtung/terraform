@@ -1,7 +1,7 @@
 # --- modules/vpc/main.tf ---
 
 # 1. Tạo VPC (Virtual Private Cloud)
-# Đây là mạng riêng ảo chứa toàn bộ tài nguyên của phòng khám.
+# Đây là mạng riêng ảo chứa toàn bộ tài nguyên.
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true # Cho phép sử dụng DNS hostname

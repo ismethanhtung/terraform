@@ -15,7 +15,7 @@ variable "environment" {
 variable "project_name" {
   description = "Tên dự án (dùng làm prefix cho tài nguyên)"
   type        = string
-  default     = "polymarket"
+  default     = "project"
 }
 
 variable "vpc_cidr" {

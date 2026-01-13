@@ -99,7 +99,7 @@ module "ecs_backend_service" {
   security_group_ids = [aws_security_group.ecs_public_sg.id]
   assign_public_ip   = true
 
-  container_image = "ismethanhtung/polymarket-server:latest"
+  container_image = "ismethanhtung/project-server:latest"
   container_port  = 8000
 
   desired_count      = 1

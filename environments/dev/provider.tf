@@ -10,10 +10,10 @@ terraform {
 
   # Backend S3 + DynamoDB để lưu state Terraform
   backend "s3" {
-    bucket         = "polymarket-infra-terraform-state"
+    bucket         = "project-infra-terraform-state"
     key            = "dev/terraform.tfstate"
     region         = "ap-southeast-1"
-    dynamodb_table = "polymarket-infra-terraform-lock"
+    dynamodb_table = "project-infra-terraform-lock"
     encrypt        = true
   }
 }

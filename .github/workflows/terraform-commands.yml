@@ -1,0 +1,156 @@
+name: Terraform Commands
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Environment (dev, prod, ...)"
+                required: true
+                type: choice
+                options:
+                    - dev
+                    - prod
+            command:
+                description: "Terraform command to run"
+                required: true
+                type: choice
+                options:
+                    - plan
+                    - apply
+                    - destroy
+                    - state-list
+                    - state-show
+                    - state-rm
+                    - graph
+                    - graph-png
+                    - validate
+                    - fmt
+                    - output
+                    - show
+                    - init
+            state_resource:
+                description: "Resource address for state-show/state-rm (e.g., module.ecs_cluster_search.aws_ecs_cluster.this)"
+                required: false
+                type: string
+            additional_args:
+                description: 'Additional arguments (e.g., -target=resource, -var="key=value")'
+                required: false
+                type: string
+                default: ""
+
+permissions:
+    id-token: write
+    contents: read
+
+env:
+    AWS_REGION: ap-southeast-1
+    AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+
+jobs:
+    terraform-command:
+        name: Terraform ${{ inputs.command }}
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: environments/${{ inputs.environment }}
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: ${{ env.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+                  role-session-name: terraform-commands
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: 1.8.5
+
+            - name: Install Graphviz (for graph commands)
+              if: inputs.command == 'graph' || inputs.command == 'graph-png'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y graphviz
+
+            - name: Terraform Init
+              if: inputs.command != 'init'
+              run: terraform init
+
+            # Plan command
+            - name: Terraform Plan
+              if: inputs.command == 'plan'
+              run: terraform plan -no-color ${{ inputs.additional_args }}
+
+            # Apply command
+            - name: Terraform Apply
+              if: inputs.command == 'apply'
+              run: terraform apply -auto-approve ${{ inputs.additional_args }}
+
+            # Destroy command
+            - name: Terraform Destroy
+              if: inputs.command == 'destroy'
+              run: terraform destroy -auto-approve ${{ inputs.additional_args }}
+
+            # State list command
+            - name: Terraform State List
+              if: inputs.command == 'state-list'
+              run: terraform state list ${{ inputs.additional_args }}
+
+            # State show command
+            - name: Terraform State Show
+              if: inputs.command == 'state-show'
+              run: terraform state show ${{ inputs.state_resource }} ${{ inputs.additional_args }}
+
+            # State rm command
+            - name: Terraform State Remove
+              if: inputs.command == 'state-rm'
+              run: terraform state rm ${{ inputs.state_resource }} ${{ inputs.additional_args }}
+
+            # Graph command (text output)
+            - name: Terraform Graph
+              if: inputs.command == 'graph'
+              run: terraform graph ${{ inputs.additional_args }}
+
+            # Graph PNG command
+            - name: Terraform Graph PNG
+              if: inputs.command == 'graph-png'
+              run: |
+                  terraform graph ${{ inputs.additional_args }} | dot -Tpng > graph.png
+                  echo "Graph saved to graph.png"
+
+            - name: Upload Graph PNG
+              if: inputs.command == 'graph-png'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: terraform-graph-${{ inputs.environment }}
+                  path: environments/${{ inputs.environment }}/graph.png
+                  retention-days: 7
+
+            # Validate command
+            - name: Terraform Validate
+              if: inputs.command == 'validate'
+              run: terraform validate ${{ inputs.additional_args }}
+
+            # Format command
+            - name: Terraform Format
+              if: inputs.command == 'fmt'
+              run: terraform fmt -check -recursive ${{ inputs.additional_args }}
+
+            # Output command
+            - name: Terraform Output
+              if: inputs.command == 'output'
+              run: terraform output ${{ inputs.additional_args }}
+
+            # Show command
+            - name: Terraform Show
+              if: inputs.command == 'show'
+              run: terraform show ${{ inputs.additional_args }}
+
+            # Init command
+            - name: Terraform Init Only
+              if: inputs.command == 'init'
+              run: terraform init ${{ inputs.additional_args }}
